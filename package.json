@@ -18,18 +18,18 @@
   "main": "index.html",
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@commitlint/cli": "^21.2.2",
+    "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.62.1",
+    "@playwright/test": "^1.64.0",
     "browser-sync": "^3.0.3",
-    "eslint": "^10.8.1",
-    "html-validate": "^11.8.0",
+    "eslint": "^10.12.0",
+    "html-validate": "^11.16.2",
     "husky": "^9.0.0",
-    "jsdom": "^30.0.1",
-    "lint-staged": "^17.3.0",
-    "prettier": "^3.9.6",
-    "vitest": "4.1.10"
+    "jsdom": "^30.1.2",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "vitest": "5.0.4"
   },
   "scripts": {
     "dev": "browser-sync start --server --files '*.html, css/*.css, js/*.js' --port 3000",
