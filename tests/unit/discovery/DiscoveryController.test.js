@@ -114,10 +114,20 @@ describe('DiscoveryController', () => {
         registry.isInitialized = true;
       }),
       getFilteredItems: vi.fn(() => [
-        { id: 'item-1', title: 'Filtered One', description: 'Filtered item', tags: ['art'] },
+        {
+          id: 'item-1',
+          title: 'Filtered One',
+          description: 'Filtered item',
+          tags: ['art'],
+        },
       ]),
       getAllItems: vi.fn(() => [
-        { id: 'item-1', title: 'Filtered One', description: 'Filtered item', tags: ['art'] },
+        {
+          id: 'item-1',
+          title: 'Filtered One',
+          description: 'Filtered item',
+          tags: ['art'],
+        },
       ]),
       getAllTags: vi.fn(() => [
         { tag: 'art', count: 3 },
@@ -267,6 +277,13 @@ describe('DiscoveryController', () => {
   });
 
   afterEach(() => {
+    // Only initialized instances have subscribed; preserve singleton-only cases.
+    if (window.discoveryControllerInstance?.isInitialized) {
+      window.discoveryControllerInstance.dispose();
+    }
+    vi.useRealTimers();
+    sessionStorage.clear();
+    window.history.replaceState(null, '', '/');
     delete global.ContentRegistry;
     delete global.SearchEngine;
     delete global.FilterSystem;
@@ -363,9 +380,12 @@ describe('DiscoveryController', () => {
 
     instance._renderResults();
 
-    const cards = instance.elements.resultsGrid.querySelectorAll('.result-card');
+    const cards =
+      instance.elements.resultsGrid.querySelectorAll('.result-card');
     expect(cards.length).toBe(2);
-    expect(instance.elements.pagination.querySelectorAll('.page-btn').length).toBe(4);
+    expect(
+      instance.elements.pagination.querySelectorAll('.page-btn').length
+    ).toBe(4);
   });
 
   it('should open and close the search modal', async () => {
@@ -414,7 +434,13 @@ describe('DiscoveryController', () => {
     const instance = DiscoveryController.getInstance();
     await instance.initialize();
 
-    expect(instance._getPaginationRange(1, 10, 5)).toEqual([1, 2, 3, '...', 10]);
+    expect(instance._getPaginationRange(1, 10, 5)).toEqual([
+      1,
+      2,
+      3,
+      '...',
+      10,
+    ]);
     expect(instance._getPaginationRange(5, 10, 5)).toEqual([
       1,
       '...',
@@ -424,7 +450,13 @@ describe('DiscoveryController', () => {
       '...',
       10,
     ]);
-    expect(instance._getPaginationRange(10, 10, 5)).toEqual([1, '...', 8, 9, 10]);
+    expect(instance._getPaginationRange(10, 10, 5)).toEqual([
+      1,
+      '...',
+      8,
+      9,
+      10,
+    ]);
   });
 
   it('should update results when handling search input', async () => {
@@ -495,5 +527,128 @@ describe('DiscoveryController', () => {
     const navSpy = vi.spyOn(instance, '_navigateToItem');
     instance._selectResult(0);
     expect(navSpy).toHaveBeenCalledWith('global-1');
+  });
+
+  // Residue recovered from closed/live #103 and open #104. All cases execute
+  // controllerSource through the existing source-reading loader above.
+  it('restores all filtered items when a query clears and ignores short queries', async () => {
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    const items = [
+      { id: 'first', title: 'First', tags: [] },
+      { id: 'second', title: 'Second', tags: [] },
+    ];
+    mocks.filterSystem.getFilteredItems.mockReturnValue(items);
+    instance.currentSearchQuery = 'previous';
+    await instance._onSearchInput({ target: { value: '' } });
+    expect(instance.currentResults).toEqual(items);
+    expect(instance.currentSearchQuery).toBe('');
+    mocks.filterSystem.getFilteredItems.mockClear();
+    mocks.searchEngine.searchDebounced.mockClear();
+    await instance._onSearchInput({ target: { value: 'x' } });
+    expect(mocks.searchEngine.searchDebounced).not.toHaveBeenCalled();
+    expect(mocks.filterSystem.getFilteredItems).not.toHaveBeenCalled();
+    expect(instance.currentResults).toEqual(items);
+  });
+
+  it('updates filtered results and re-runs an active search with the filter state', async () => {
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    const item = { id: 'filtered', title: 'Filtered work', tags: [] };
+    mocks.filterSystem.getFilteredItems.mockReturnValue([item]);
+    mocks.filterSystem.getSummaryText.mockReturnValue('music');
+    const state = { tags: ['music'], fromYear: 2020, toYear: 2025 };
+    instance._onFilterChange(state);
+    expect(instance.currentResults).toEqual([item]);
+    expect(document.getElementById('filterSummary').textContent).toBe('music');
+    instance.currentSearchQuery = 'work';
+    mocks.searchEngine.search.mockReturnValue([{ item }]);
+    instance._onFilterChange(state);
+    expect(mocks.searchEngine.search).toHaveBeenCalledWith('work', {
+      filter: state,
+    });
+    expect(instance.currentResults).toEqual([item]);
+  });
+
+  it('handles modal keyboard selection and Escape through subscribed events', async () => {
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
+    );
+    expect(instance.isSearchModalOpen).toBe(true);
+    instance._renderGlobalSearchResults([
+      { item: { id: 'first', title: 'First' } },
+      { item: { id: 'second', title: 'Second' } },
+    ]);
+    const results = [...document.querySelectorAll('.search-result-item')];
+    // jsdom lacks this browser API; stub only the platform boundary.
+    results.forEach(element => {
+      element.scrollIntoView = vi.fn();
+    });
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    expect(instance.selectedResultIndex).toBe(0);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+    expect(instance.selectedResultIndex).toBe(1);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+    expect(instance.selectedResultIndex).toBe(0);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(mocks.showNewSection).toHaveBeenCalledWith('#akademia');
+    expect(sessionStorage.getItem('etceter4-highlight-item')).toBe('first');
+    expect(instance.isSearchModalOpen).toBe(false);
+    instance.openSearchModal();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(instance.isSearchModalOpen).toBe(false);
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('navigates a shared URL item after initialization with its stable chamber id', async () => {
+    vi.useFakeTimers();
+    mocks.shareLinks.getItemIdFromUrl.mockReturnValue('album-1');
+    mocks.registry.getItem.mockReturnValue({
+      id: 'album-1',
+      chamber: 'odeion',
+      chamberName: 'ODEION',
+    });
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    expect(mocks.showNewSection).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(500);
+    expect(mocks.showNewSection).toHaveBeenCalledWith('#odeion');
+    expect(sessionStorage.getItem('etceter4-highlight-item')).toBe('album-1');
+  });
+
+  it('falls back to hash navigation when no router function is supplied', async () => {
+    DiscoveryController = loadControllerClass({
+      ...mocks,
+      showNewSection: undefined,
+    });
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    instance._navigateToItem('item-1');
+    expect(window.location.hash).toBe('#akademia');
+    expect(sessionStorage.getItem('etceter4-highlight-item')).toBe('item-1');
+  });
+
+  it('reports status and disposes the subscriptions it established', async () => {
+    const instance = DiscoveryController.getInstance();
+    await instance.initialize();
+    const remove = vi.spyOn(document, 'removeEventListener');
+    expect(instance.getStatus()).toMatchObject({
+      isInitialized: true,
+      isSearchModalOpen: false,
+    });
+    instance.dispose();
+    expect(remove).toHaveBeenCalledWith('keydown', instance._onKeyDown);
+    expect(mocks.filterSystem.offChange).toHaveBeenCalledWith(
+      instance._onFilterChange
+    );
+    expect(mocks.filterSystem.listeners.size).toBe(0);
+    expect(instance.currentResults).toEqual([]);
+    expect(instance.isInitialized).toBe(false);
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'k', ctrlKey: true })
+    );
+    expect(instance.isSearchModalOpen).toBe(false);
   });
 });
