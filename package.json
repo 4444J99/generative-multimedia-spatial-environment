@@ -29,7 +29,7 @@
     "jsdom": "^30.0.1",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
-    "vitest": "4.1.10"
+    "vitest": "5.0.5"
   },
   "scripts": {
     "dev": "browser-sync start --server --files '*.html, css/*.css, js/*.js' --port 3000",
