@@ -11,12 +11,12 @@
   "dependencies": {
     "lit": "^3.3.0",
     "@lit/context": "^1.1.5",
-    "@google/genai": "^2.30.0",
-    "three": "^0.186.1"
+    "@google/genai": "^3.4.0",
+    "three": "^0.187.0"
   },
   "devDependencies": {
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "typescript": "~7.0.2",
-    "vite": "^8.3.5"
+    "vite": "^8.3.8"
   }
 }
