@@ -37,6 +37,7 @@ jobs:
       - run: npm run validate:package-lock
       - run: npm run lint
       - run: npm run format:check
+      - run: npm run typecheck
       - run: npm run test:unit
       - run: npm run test:publication
       - run: npm run validate:html

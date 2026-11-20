@@ -233,10 +233,12 @@ class PlaylistManager {
       'odeion-volume',
     ].forEach(id => {
       const control = document.getElementById(id);
-      if (
-        control instanceof HTMLButtonElement ||
-        control instanceof HTMLInputElement
-      ) {
+      // The six ids are buttons plus one range input, all of which carry
+      // `disabled`. A property check, not `instanceof HTMLButtonElement` /
+      // `HTMLInputElement`: the source-catalogue tests load this file in a
+      // vm context where the DOM constructor globals are not defined, so
+      // the instanceof form throws ReferenceError there (11 CI failures).
+      if (control && 'disabled' in control) {
         control.disabled = !enabled;
       }
     });
