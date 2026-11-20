@@ -228,7 +228,7 @@ class LyricsSync {
     this.lyrics.forEach((lyric, index) => {
       const lineElement = document.createElement('div');
       lineElement.className = this.lineClass;
-      lineElement.dataset.index = index;
+      lineElement.dataset.index = String(index);
       lineElement.dataset.time = lyric.time;
       lineElement.textContent = lyric.text;
 

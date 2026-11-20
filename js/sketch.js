@@ -1,9 +1,15 @@
 'use strict';
 
+/**
+ * Active p5 instance. `id` tracks which canvas is showing and
+ * `_renderer.GL` is the WebGL context the vendored p5 build exposes
+ * (not declared in @types/p5).
+ * @type {p5 & { id?: string, _renderer?: { GL?: WebGLRenderingContext | null } }}
+ */
 let myp5;
 let visionImage;
 let isSketchTransitioning = false;
-const footerHeight = $('footer').css('height').replace('px', '');
+const footerHeight = Number($('footer').css('height').replace('px', ''));
 
 /**
  * Flag to track if current sketch uses WebGL mode
@@ -50,7 +56,7 @@ function safeRemoveP5() {
 
 /**
  * Switches to a new p5 canvas with safe cleanup
- * @param {Function} canvasFunc - The p5 sketch function
+ * @param {(p: p5) => void} canvasFunc - The p5 sketch function
  * @param {string} canvasId - Identifier for the canvas type
  * @param {boolean} [useWebGL=false] - Whether the sketch uses WebGL mode
  */
@@ -65,7 +71,10 @@ function switchCanvas(canvasFunc, canvasId, useWebGL = false) {
 
   if (!myp5) {
     try {
-      myp5 = new p5(canvasFunc, 'menuPageCanvasWrapper');
+      myp5 = new p5(
+        canvasFunc,
+        document.getElementById('menuPageCanvasWrapper')
+      );
       myp5.id = canvasId;
       isWebGLSketch = useWebGL;
     } catch (err) {
@@ -74,7 +83,10 @@ function switchCanvas(canvasFunc, canvasId, useWebGL = false) {
   } else if (myp5.id !== canvasId) {
     safeRemoveP5().then(() => {
       try {
-        myp5 = new p5(canvasFunc, 'menuPageCanvasWrapper');
+        myp5 = new p5(
+          canvasFunc,
+          document.getElementById('menuPageCanvasWrapper')
+        );
         myp5.id = canvasId;
         isWebGLSketch = useWebGL;
       } catch (err) {
@@ -943,16 +955,14 @@ function removeCanvas() {
   $('#menuPageCanvasWrapper canvas').remove();
 }
 
-function _2DRandomWalk(vector) {
-  const _nx = p.noise(vector.time.x);
-  const _ny = p.noise(vector.time.y);
-  vector.time.x += rate;
-  vector.time.y += rate;
-
-  const _x = p.map(_nx, 0, 1, 0, bounds.x);
-  const _y = p.map(_ny, 0, 1, 0, bounds.y);
-  vector.location.set(_x, _y);
-}
+// NOTE: two global-mode helpers used to live here — _2DRandomWalk(vector)
+// and getRandomColor() — but they referenced the p5 instance `p` and the
+// words-canvas locals `rate` / `bounds`, none of which exist at top level
+// in instance mode, so neither could ever run. The live implementations
+// are Word.prototype._2DRandomWalk (inside wordsCanvas, closed over its own
+// p/rate/bounds) and the inner getColor() (inside soundCanvas). The dead
+// duplicates were removed when type-checking was added (organvm-engine
+// #60); they had zero callers anywhere in the repo.
 
 function getBezierPoint(t) {
   /*
@@ -983,13 +993,6 @@ function getBezierPoint(t) {
   const D = curve.u3 * Math.pow(t, 3);
 
   return B + C + D; // + A
-}
-
-function getRandomColor() {
-  const r = Math.floor(p.randomGaussian(127, 40)) % 255;
-  const g = Math.floor(p.randomGaussian(127, 40)) % 255;
-  const b = Math.floor(p.randomGaussian(127, 40)) % 255;
-  return p.color(r, g, b);
 }
 
 function curveInAndOut(x) {

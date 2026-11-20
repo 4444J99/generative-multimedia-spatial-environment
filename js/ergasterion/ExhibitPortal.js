@@ -106,7 +106,10 @@ class ExhibitPortal {
 
     // Bind events
     this.galleryEl.addEventListener('click', e => {
-      const card = e.target.closest('.exhibit-card');
+      const target = /** @type {HTMLElement} */ (e.target);
+      const card = /** @type {HTMLElement | null} */ (
+        target.closest('.exhibit-card')
+      );
       if (card) {
         this.launchExhibit(card.dataset.exhibitId);
       }
@@ -177,7 +180,9 @@ class ExhibitPortal {
     }
 
     // Set iframe src
-    const iframe = document.getElementById('exhibit-iframe');
+    const iframe = /** @type {HTMLIFrameElement | null} */ (
+      document.getElementById('exhibit-iframe')
+    );
     if (!iframe) {
       return;
     }
@@ -265,7 +270,9 @@ class ExhibitPortal {
     }
 
     // Clear iframe
-    const iframe = document.getElementById('exhibit-iframe');
+    const iframe = /** @type {HTMLIFrameElement | null} */ (
+      document.getElementById('exhibit-iframe')
+    );
     if (iframe) {
       iframe.src = 'about:blank';
     }
@@ -315,8 +322,8 @@ class ExhibitPortal {
   /**
    * Render fallback for an exhibit (lifecycle method)
    * @param {Object|string} exhibit
-   * @param {HTMLElement} [container]
-   * @param {string} [reason]
+   * @param {HTMLElement} [_container]
+   * @param {string} [_reason]
    */
   renderFallback(exhibit, _container, _reason) {
     const targetExhibit =

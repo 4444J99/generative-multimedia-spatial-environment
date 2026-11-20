@@ -20,16 +20,15 @@ class EnhancedAudioPlayer {
   /**
    * Create an EnhancedAudioPlayer instance
    * @param {Object} options - Configuration object
-   * @param {Array<Object>} options.tracks - Array of track objects with id, title, url properties
+   * @param {Array<Object>} [options.tracks] - Array of track objects with id, title, url properties (empty until tracks are added via addTrack)
    * @param {number} [options.volume] - Initial volume (0-1), defaults to config.defaultVolume
    * @param {number} [options.crossfadeDuration] - Crossfade duration in ms, defaults to config
    * @param {boolean} [options.autoPlay] - Whether to start playing automatically
+   * @param {boolean} [options.autoAdvance] - Whether to advance to the next track when one ends, defaults to true
    */
   constructor(options = {}) {
     const siteConfig =
-      typeof ETCETER4_CONFIG !== 'undefined'
-        ? ETCETER4_CONFIG
-        : globalThis.ETCETER4_CONFIG;
+      typeof ETCETER4_CONFIG !== 'undefined' ? ETCETER4_CONFIG : undefined;
     this.config = siteConfig?.media?.audio || {
       crossfadeDuration: 1000,
       defaultVolume: 0.8,
@@ -70,8 +69,9 @@ class EnhancedAudioPlayer {
   }
 
   /**
-   * Load a track by index
-   * @private
+   * Load a track by index. Public: PlaylistManager drives track selection
+   * through it (it is the player's track-loading entry point, not an
+   * internal helper).
    * @param {number} index - Track index to load
    */
   loadTrack(index) {
@@ -328,9 +328,8 @@ class EnhancedAudioPlayer {
   }
 
   /**
-   * Set volume with optional fade
+   * Set volume
    * @param {number} vol - Volume level (0-1)
-   * @param {number} [fadeDuration] - Optional fade duration in ms
    */
   setVolume(vol) {
     const clampedVolume = Math.max(0, Math.min(1, vol));

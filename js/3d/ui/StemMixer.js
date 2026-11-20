@@ -172,8 +172,8 @@ class StemMixer {
     toggleBtn.addEventListener('click', () => this.toggleCollapse());
 
     // Master volume
-    const masterSlider = this.containerElement.querySelector(
-      '#mixer-master-volume'
+    const masterSlider = /** @type {HTMLInputElement | null} */ (
+      this.containerElement.querySelector('#mixer-master-volume')
     );
     masterSlider.addEventListener('input', e =>
       this._handleMasterVolumeChange(e)
@@ -214,7 +214,8 @@ class StemMixer {
    * @param {Event} e
    */
   _handleMasterVolumeChange(e) {
-    this.masterVolume = parseInt(e.target.value, 10);
+    const target = /** @type {HTMLInputElement} */ (e.target);
+    this.masterVolume = parseInt(target.value, 10);
 
     // Update display
     const valueDisplay = this.containerElement.querySelector('#master-value');
@@ -239,8 +240,9 @@ class StemMixer {
    * @param {Event} e
    */
   _handleStemVolumeChange(e) {
-    const stem = e.target.dataset.stem;
-    const value = parseInt(e.target.value, 10);
+    const target = /** @type {HTMLInputElement} */ (e.target);
+    const stem = target.dataset.stem;
+    const value = parseInt(target.value, 10);
     this.volumes[stem] = value;
 
     // Update display
@@ -266,12 +268,13 @@ class StemMixer {
    * @param {Event} e
    */
   _handleMuteClick(e) {
-    const stem = e.target.dataset.stem;
+    const target = /** @type {HTMLButtonElement} */ (e.target);
+    const stem = target.dataset.stem;
     this.muted[stem] = !this.muted[stem];
 
     // Update button state
-    e.target.classList.toggle('active', this.muted[stem]);
-    e.target.setAttribute('aria-pressed', this.muted[stem]);
+    target.classList.toggle('active', this.muted[stem]);
+    target.setAttribute('aria-pressed', String(this.muted[stem]));
 
     // If muting, clear solo
     if (this.muted[stem]) {
@@ -295,12 +298,13 @@ class StemMixer {
    * @param {Event} e
    */
   _handleSoloClick(e) {
-    const stem = e.target.dataset.stem;
+    const target = /** @type {HTMLButtonElement} */ (e.target);
+    const stem = target.dataset.stem;
     this.soloed[stem] = !this.soloed[stem];
 
     // Update button state
-    e.target.classList.toggle('active', this.soloed[stem]);
-    e.target.setAttribute('aria-pressed', this.soloed[stem]);
+    target.classList.toggle('active', this.soloed[stem]);
+    target.setAttribute('aria-pressed', String(this.soloed[stem]));
 
     // If soloing, unmute this stem
     if (this.soloed[stem] && this.muted[stem]) {
@@ -416,8 +420,8 @@ class StemMixer {
         this.meterValues[stem] = this.meterValues[stem] * 0.7 + level * 0.3;
 
         // Update meter fill
-        const meter = this.containerElement.querySelector(
-          `#mixer-meter-${stem}`
+        const meter = /** @type {HTMLElement | null} */ (
+          this.containerElement.querySelector(`#mixer-meter-${stem}`)
         );
         if (meter) {
           meter.style.height = `${this.meterValues[stem] * 100}%`;
@@ -447,9 +451,11 @@ class StemMixer {
     this.containerElement.classList.toggle('collapsed', this.isCollapsed);
 
     const toggleBtn = this.containerElement.querySelector('.stem-mixer-toggle');
-    toggleBtn.setAttribute('aria-expanded', !this.isCollapsed);
+    toggleBtn.setAttribute('aria-expanded', String(!this.isCollapsed));
 
-    const content = this.containerElement.querySelector('#stem-mixer-content');
+    const content = /** @type {HTMLElement | null} */ (
+      this.containerElement.querySelector('#stem-mixer-content')
+    );
     content.hidden = this.isCollapsed;
   }
 
@@ -503,12 +509,12 @@ class StemMixer {
 
     if (state.masterVolume !== undefined) {
       this.masterVolume = state.masterVolume;
-      const masterSlider = this.containerElement.querySelector(
-        '#mixer-master-volume'
+      const masterSlider = /** @type {HTMLInputElement | null} */ (
+        this.containerElement.querySelector('#mixer-master-volume')
       );
       const masterValue = this.containerElement.querySelector('#master-value');
       if (masterSlider) {
-        masterSlider.value = this.masterVolume;
+        masterSlider.value = String(this.masterVolume);
       }
       if (masterValue) {
         masterValue.textContent = `${this.masterVolume}%`;
@@ -519,8 +525,10 @@ class StemMixer {
       this.stems.forEach(stem => {
         if (state.volumes[stem] !== undefined) {
           this.volumes[stem] = state.volumes[stem];
-          const slider = this.containerElement.querySelector(
-            `.stem-volume-slider[data-stem="${stem}"]`
+          const slider = /** @type {HTMLInputElement | null} */ (
+            this.containerElement.querySelector(
+              `.stem-volume-slider[data-stem="${stem}"]`
+            )
           );
           const valueDisplay = this.containerElement.querySelector(
             `#stem-value-${stem}`
@@ -580,8 +588,10 @@ class StemMixer {
 
     this.volumes[stem] = Math.max(0, Math.min(100, volume));
 
-    const slider = this.containerElement.querySelector(
-      `.stem-volume-slider[data-stem="${stem}"]`
+    const slider = /** @type {HTMLInputElement | null} */ (
+      this.containerElement.querySelector(
+        `.stem-volume-slider[data-stem="${stem}"]`
+      )
     );
     const valueDisplay = this.containerElement.querySelector(
       `#stem-value-${stem}`
@@ -604,13 +614,13 @@ class StemMixer {
   setMasterVolume(volume) {
     this.masterVolume = Math.max(0, Math.min(100, volume));
 
-    const masterSlider = this.containerElement.querySelector(
-      '#mixer-master-volume'
+    const masterSlider = /** @type {HTMLInputElement | null} */ (
+      this.containerElement.querySelector('#mixer-master-volume')
     );
     const masterValue = this.containerElement.querySelector('#master-value');
 
     if (masterSlider) {
-      masterSlider.value = this.masterVolume;
+      masterSlider.value = String(this.masterVolume);
     }
     if (masterValue) {
       masterValue.textContent = `${this.masterVolume}%`;
@@ -637,7 +647,7 @@ class StemMixer {
     );
     if (muteBtn) {
       muteBtn.classList.toggle('active', muted);
-      muteBtn.setAttribute('aria-pressed', muted);
+      muteBtn.setAttribute('aria-pressed', String(muted));
     }
 
     this._applyVolumes();
@@ -659,7 +669,7 @@ class StemMixer {
     );
     if (soloBtn) {
       soloBtn.classList.toggle('active', soloed);
-      soloBtn.setAttribute('aria-pressed', soloed);
+      soloBtn.setAttribute('aria-pressed', String(soloed));
     }
 
     this._applyVolumes();

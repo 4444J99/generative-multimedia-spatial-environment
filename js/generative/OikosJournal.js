@@ -36,7 +36,9 @@ class OikosJournal {
       return;
     }
 
-    const mounts = container.querySelectorAll('.oikos-journal-mount');
+    const mounts = /** @type {NodeListOf<HTMLElement>} */ (
+      container.querySelectorAll('.oikos-journal-mount')
+    );
     if (mounts.length === 0) {
       return;
     }
@@ -93,9 +95,15 @@ class OikosJournal {
     mount.appendChild(wrapper);
 
     // Bind events
-    const textarea = textareaWrap.querySelector('.oikos-textarea');
-    const charCount = textareaWrap.querySelector('.oikos-char-count');
-    const saveBtn = textareaWrap.querySelector('.oikos-save-btn');
+    const textarea = /** @type {HTMLTextAreaElement | null} */ (
+      textareaWrap.querySelector('.oikos-textarea')
+    );
+    const charCount = /** @type {HTMLElement | null} */ (
+      textareaWrap.querySelector('.oikos-char-count')
+    );
+    const saveBtn = /** @type {HTMLButtonElement | null} */ (
+      textareaWrap.querySelector('.oikos-save-btn')
+    );
 
     textarea.addEventListener('input', () => {
       const len = textarea.value.length;
@@ -121,7 +129,7 @@ class OikosJournal {
     });
 
     // Allow Ctrl/Cmd+Enter to save
-    textarea.addEventListener('keydown', e => {
+    textarea.addEventListener('keydown', (/** @type {KeyboardEvent} */ e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         saveBtn.click();
@@ -245,13 +253,15 @@ class OikosJournal {
       .join('');
 
     // Bind delete buttons
-    listEl.querySelectorAll('.oikos-entry-delete').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.deleteId;
-        this._deleteEntry(id);
-        this._renderEntries(listEl, type, color);
+    listEl
+      .querySelectorAll('.oikos-entry-delete')
+      .forEach((/** @type {HTMLElement} */ btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.deleteId;
+          this._deleteEntry(id);
+          this._renderEntries(listEl, type, color);
+        });
       });
-    });
   }
 
   /**

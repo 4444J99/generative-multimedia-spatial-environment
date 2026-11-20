@@ -22,8 +22,14 @@
     "@commitlint/config-conventional": "^21.2.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.1",
+    "@types/google.analytics": "^0.0.46",
+    "@types/howler": "^2.2.13",
+    "@types/jquery": "^3.5.34",
+    "@types/p5": "^1.7.7",
+    "@types/video.js": "^7.3.58",
     "browser-sync": "^3.0.3",
     "eslint": "^10.15.0",
+    "hls.js": "^1.7.4",
     "html-validate": "^11.21.1",
     "husky": "^9.0.0",
     "jsdom": "^31.0.1",
@@ -31,6 +37,7 @@
     "prettier": "^3.10.1",
     "semver": "^7.8.6",
     "sharp": "^0.35.5",
+    "typescript": "^5.9.3",
     "vitest": "5.1.0"
   },
   "scripts": {
@@ -60,7 +67,8 @@
     "build:p5js-playground": "cd absorb-alchemize/p5js-playground && npm install && npm run build",
     "build:synthwave-space": "cd absorb-alchemize/synthwave-space && npm install && npm run build",
     "generate:ambient": "node scripts/generate-ambient-audio.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "repository": {
     "type": "git",

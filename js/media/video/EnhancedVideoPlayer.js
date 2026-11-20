@@ -31,7 +31,10 @@ class EnhancedVideoPlayer {
    * @param {boolean} [options.hlsSupport=true] - Whether to enable HLS.js for .m3u8 streams
    * @param {string} [options.posterUrl=null] - Poster image URL
    */
-  constructor(options = {}) {
+  // The default carries container: null (not {}) so the no-argument call
+  // still reaches the explicit 'container element required' throw below
+  // instead of failing the typecheck on an empty default.
+  constructor(options = { container: null }) {
     this.options = {
       autoplay: false,
       controls: true,
@@ -386,6 +389,7 @@ class EnhancedVideoPlayer {
       const Hls = window.Hls;
 
       if (Hls.isSupported()) {
+        /** @type {{ maxBufferLength?: number, maxMaxBufferLength?: number, startLevel?: number, enableWorker?: boolean, lowLatencyMode?: boolean }} */
         const hlsConfig = window.ETCETER4_CONFIG?.media?.video?.hlsConfig || {};
 
         this.hlsInstance = new Hls({

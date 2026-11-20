@@ -36,7 +36,7 @@ class ChamberLoader {
     /** @type {Set<string>} Successfully loaded chamber IDs */
     this._loaded = new Set();
 
-    /** @type {Map<string, Promise<string>>} chamberId → in-flight preload promise */
+    /** @type {Map<string, Promise<void>>} chamberId → in-flight preload promise */
     this._preloadPromises = new Map();
   }
 
@@ -173,7 +173,11 @@ class ChamberLoader {
 
       // 2. Fetch and inject HTML fragment
       if (manifest.html) {
-        await this._loadFragment(chamberId, manifest.html, el);
+        await this._loadFragment(
+          chamberId,
+          manifest.html,
+          /** @type {HTMLElement} */ (el)
+        );
       }
 
       // 3. Load scripts in order
@@ -254,6 +258,15 @@ class ChamberLoader {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Whether preloading should be skipped based on connection quality.
+   * Public read of the internal check, for navigation in page.js.
+   * @returns {boolean}
+   */
+  shouldSkipPreload() {
+    return this._shouldSkipPreload();
   }
 
   /**

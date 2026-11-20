@@ -117,7 +117,7 @@ class AudioPlayer {
 
     // Volume controls
     $(`#${this.id}-volume`).on('input', function () {
-      self.setVolume($(this).val() / 100);
+      self.setVolume(Number($(this).val()) / 100);
     });
 
     $(`#${this.id}-volume-btn`).on('click', () => this.toggleMute());

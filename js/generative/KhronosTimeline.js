@@ -18,7 +18,7 @@ class KhronosTimeline {
     this.svg = null;
     /** @type {number} */
     this.viewOffsetX = 0;
-    /** @type {number} */
+    /** @type {boolean} */
     this.isDragging = false;
     /** @type {number} */
     this.dragStartX = 0;
@@ -233,18 +233,18 @@ class KhronosTimeline {
       const x1 = this._dateToX(era.startDate);
       const x2 = this._dateToX(era.endDate);
       const rect = document.createElementNS(ns, 'rect');
-      rect.setAttribute('x', x1);
-      rect.setAttribute('y', 20);
-      rect.setAttribute('width', Math.max(x2 - x1, 1));
-      rect.setAttribute('height', this.timelineHeight - 50);
+      rect.setAttribute('x', String(x1));
+      rect.setAttribute('y', String(20));
+      rect.setAttribute('width', String(Math.max(x2 - x1, 1)));
+      rect.setAttribute('height', String(this.timelineHeight - 50));
       rect.setAttribute('fill', `url(#era-grad-${era.id})`);
-      rect.setAttribute('rx', 4);
+      rect.setAttribute('rx', String(4));
       svg.appendChild(rect);
 
       // Era label
       const eraLabel = document.createElementNS(ns, 'text');
-      eraLabel.setAttribute('x', (x1 + x2) / 2);
-      eraLabel.setAttribute('y', this.timelineHeight - 18);
+      eraLabel.setAttribute('x', String((x1 + x2) / 2));
+      eraLabel.setAttribute('y', String(this.timelineHeight - 18));
       eraLabel.setAttribute('text-anchor', 'middle');
       eraLabel.setAttribute('fill', era.color);
       eraLabel.setAttribute('font-size', '10');
@@ -256,10 +256,10 @@ class KhronosTimeline {
 
     // Main timeline axis
     const axisLine = document.createElementNS(ns, 'line');
-    axisLine.setAttribute('x1', this.padding);
-    axisLine.setAttribute('y1', this.timelineHeight / 2);
-    axisLine.setAttribute('x2', this.timelineWidth - this.padding);
-    axisLine.setAttribute('y2', this.timelineHeight / 2);
+    axisLine.setAttribute('x1', String(this.padding));
+    axisLine.setAttribute('y1', String(this.timelineHeight / 2));
+    axisLine.setAttribute('x2', String(this.timelineWidth - this.padding));
+    axisLine.setAttribute('y2', String(this.timelineHeight / 2));
     axisLine.setAttribute('stroke', '#6495ed');
     axisLine.setAttribute('stroke-width', '2');
     axisLine.setAttribute('opacity', '0.4');
@@ -277,10 +277,10 @@ class KhronosTimeline {
 
       // Connector line
       const connector = document.createElementNS(ns, 'line');
-      connector.setAttribute('x1', x);
-      connector.setAttribute('y1', midY);
-      connector.setAttribute('x2', x);
-      connector.setAttribute('y2', above ? midY - 25 : midY + 25);
+      connector.setAttribute('x1', String(x));
+      connector.setAttribute('y1', String(midY));
+      connector.setAttribute('x2', String(x));
+      connector.setAttribute('y2', String(above ? midY - 25 : midY + 25));
       connector.setAttribute('stroke', '#6495ed');
       connector.setAttribute('stroke-width', '1');
       connector.setAttribute('opacity', '0.5');
@@ -288,8 +288,8 @@ class KhronosTimeline {
 
       // Milestone dot
       const circle = document.createElementNS(ns, 'circle');
-      circle.setAttribute('cx', x);
-      circle.setAttribute('cy', midY);
+      circle.setAttribute('cx', String(x));
+      circle.setAttribute('cy', String(midY));
       circle.setAttribute('r', '5');
       circle.setAttribute('fill', '#6495ed');
       circle.classList.add('milestone-pulse', 'khronos-milestone');
@@ -299,8 +299,8 @@ class KhronosTimeline {
       // Label
       const labelY = above ? midY - 32 : midY + 42;
       const label = document.createElementNS(ns, 'text');
-      label.setAttribute('x', x);
-      label.setAttribute('y', labelY);
+      label.setAttribute('x', String(x));
+      label.setAttribute('y', String(labelY));
       label.setAttribute('text-anchor', 'middle');
       label.setAttribute('fill', 'white');
       label.setAttribute('font-size', '11');
@@ -310,8 +310,8 @@ class KhronosTimeline {
 
       // Date sub-label
       const dateLabel = document.createElementNS(ns, 'text');
-      dateLabel.setAttribute('x', x);
-      dateLabel.setAttribute('y', above ? labelY - 13 : labelY + 13);
+      dateLabel.setAttribute('x', String(x));
+      dateLabel.setAttribute('y', String(above ? labelY - 13 : labelY + 13));
       dateLabel.setAttribute('text-anchor', 'middle');
       dateLabel.setAttribute('fill', '#6495ed');
       dateLabel.setAttribute('font-size', '9');
@@ -328,19 +328,19 @@ class KhronosTimeline {
       const detailBg = document.createElementNS(ns, 'rect');
       const detailX = Math.max(10, Math.min(x - 100, this.timelineWidth - 210));
       const detailY = above ? midY - 85 : midY + 55;
-      detailBg.setAttribute('x', detailX);
-      detailBg.setAttribute('y', detailY);
-      detailBg.setAttribute('width', 200);
-      detailBg.setAttribute('height', 40);
+      detailBg.setAttribute('x', String(detailX));
+      detailBg.setAttribute('y', String(detailY));
+      detailBg.setAttribute('width', String(200));
+      detailBg.setAttribute('height', String(40));
       detailBg.setAttribute('fill', 'rgba(0, 0, 0, 0.9)');
       detailBg.setAttribute('stroke', '#6495ed');
       detailBg.setAttribute('stroke-width', '1');
-      detailBg.setAttribute('rx', 4);
+      detailBg.setAttribute('rx', String(4));
       detailGroup.appendChild(detailBg);
 
       const detailText = document.createElementNS(ns, 'text');
-      detailText.setAttribute('x', detailX + 10);
-      detailText.setAttribute('y', detailY + 16);
+      detailText.setAttribute('x', String(detailX + 10));
+      detailText.setAttribute('y', String(detailY + 16));
       detailText.setAttribute('fill', 'white');
       detailText.setAttribute('font-size', '9');
       detailText.setAttribute('font-family', 'inherit');
@@ -357,14 +357,14 @@ class KhronosTimeline {
       });
 
       const tspan1 = document.createElementNS(ns, 'tspan');
-      tspan1.setAttribute('x', detailX + 10);
+      tspan1.setAttribute('x', String(detailX + 10));
       tspan1.setAttribute('dy', '0');
       tspan1.textContent = line1;
       detailText.appendChild(tspan1);
 
       if (line2) {
         const tspan2 = document.createElementNS(ns, 'tspan');
-        tspan2.setAttribute('x', detailX + 10);
+        tspan2.setAttribute('x', String(detailX + 10));
         tspan2.setAttribute('dy', '13');
         tspan2.textContent = line2;
         detailText.appendChild(tspan2);

@@ -272,16 +272,20 @@ class SettingsPanel {
     const tabButtons = this.panelElement.querySelectorAll('.settings-tab');
     tabButtons.forEach(btn => {
       btn.addEventListener('click', e =>
-        this._switchSection(e.target.dataset.section)
+        this._switchSection(
+          /** @type {HTMLElement} */ (e.target).dataset.section
+        )
       );
     });
 
     // Setting inputs
     const inputs = this.panelElement.querySelectorAll('[data-setting]');
-    inputs.forEach(input => {
-      const eventType = input.type === 'checkbox' ? 'change' : 'input';
-      input.addEventListener(eventType, e => this._handleSettingChange(e));
-    });
+    inputs.forEach(
+      (/** @type {HTMLInputElement | HTMLSelectElement} */ input) => {
+        const eventType = input.type === 'checkbox' ? 'change' : 'input';
+        input.addEventListener(eventType, e => this._handleSettingChange(e));
+      }
+    );
   }
 
   /**
@@ -342,8 +346,10 @@ class SettingsPanel {
     const focusableElements = this.panelElement.querySelectorAll(
       'button, input, select, [tabindex]:not([tabindex="-1"])'
     );
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
+    const firstElement = /** @type {HTMLElement} */ (focusableElements[0]);
+    const lastElement = /** @type {HTMLElement} */ (
+      focusableElements[focusableElements.length - 1]
+    );
 
     if (e.shiftKey && document.activeElement === firstElement) {
       lastElement.focus();
@@ -366,15 +372,15 @@ class SettingsPanel {
 
     // Update tabs
     const tabs = this.panelElement.querySelectorAll('.settings-tab');
-    tabs.forEach(tab => {
+    tabs.forEach((/** @type {HTMLElement} */ tab) => {
       const isActive = tab.dataset.section === sectionId;
       tab.classList.toggle('active', isActive);
-      tab.setAttribute('aria-selected', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
     });
 
     // Update sections
     const sections = this.panelElement.querySelectorAll('.settings-section');
-    sections.forEach(section => {
+    sections.forEach((/** @type {HTMLElement} */ section) => {
       const isActive = section.id === `section-${sectionId}`;
       section.classList.toggle('active', isActive);
       section.hidden = !isActive;
@@ -389,12 +395,14 @@ class SettingsPanel {
    * @param {Event} e
    */
   _handleSettingChange(e) {
-    const input = e.target;
+    const input = /** @type {HTMLInputElement | HTMLSelectElement} */ (
+      e.target
+    );
     const settingPath = input.dataset.setting;
     const [category, key] = settingPath.split('.');
 
     let value;
-    if (input.type === 'checkbox') {
+    if (input instanceof HTMLInputElement && input.type === 'checkbox') {
       value = input.checked;
     } else if (input.type === 'range') {
       value = parseInt(input.value, 10);
@@ -403,7 +411,8 @@ class SettingsPanel {
         `#${input.id}-value`
       );
       if (valueDisplay) {
-        valueDisplay.textContent = key === 'moveSpeed' ? value : `${value}%`;
+        valueDisplay.textContent =
+          key === 'moveSpeed' ? String(value) : `${value}%`;
       }
     } else {
       value = input.value;
@@ -594,11 +603,14 @@ class SettingsPanel {
   _updateUIFromSettings() {
     Object.entries(this.settings).forEach(([category, values]) => {
       Object.entries(values).forEach(([key, value]) => {
-        const input = this.panelElement.querySelector(
-          `[data-setting="${category}.${key}"]`
-        );
+        const input =
+          /** @type {HTMLInputElement | HTMLSelectElement | null} */ (
+            this.panelElement.querySelector(
+              `[data-setting="${category}.${key}"]`
+            )
+          );
         if (input) {
-          if (input.type === 'checkbox') {
+          if (input instanceof HTMLInputElement && input.type === 'checkbox') {
             input.checked = value;
           } else if (input.type === 'range') {
             input.value = value;
@@ -647,8 +659,8 @@ class SettingsPanel {
 
     // Focus first interactive element
     setTimeout(() => {
-      const firstFocusable = this.panelElement.querySelector(
-        'button, input, select'
+      const firstFocusable = /** @type {HTMLElement | null} */ (
+        this.panelElement.querySelector('button, input, select')
       );
       if (firstFocusable) {
         firstFocusable.focus();

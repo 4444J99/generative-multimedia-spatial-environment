@@ -19,7 +19,7 @@ class SymposionDialogues {
     this.initialized = false;
     /** @type {Array<HTMLElement>} Managed dialogue containers */
     this.containers = [];
-    /** @type {number|null} Auto-regeneration interval */
+    /** @type {ReturnType<typeof setInterval> | null} Auto-regeneration interval */
     this.regenInterval = null;
 
     // Topic pools for dialogue generation
@@ -144,7 +144,7 @@ class SymposionDialogues {
       return;
     }
 
-    dialogues.forEach(el => {
+    dialogues.forEach((/** @type {HTMLElement} */ el) => {
       this.containers.push(el);
       this._generateAndRender(el);
     });

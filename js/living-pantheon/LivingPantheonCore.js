@@ -36,6 +36,73 @@
 'use strict';
 
 /**
+ * Living Pantheon configuration, mirroring ETCETER4_CONFIG.livingPantheon
+ * (js/config.js). Every field is optional: the constructor falls back to {}
+ * when the global config is absent, and each subsystem merges its own
+ * defaults over the section it reads.
+ *
+ * @typedef {Object} LivingPantheonConfig
+ * @property {boolean} [enabled] - Master toggle
+ * @property {Object} [glitch] - Global glitch effects
+ * @property {boolean} [glitch.enabled]
+ * @property {number} [glitch.frequency] - Probability of a glitch per check
+ * @property {number} [glitch.checkInterval] - Check interval in ms
+ * @property {string[]} [glitch.types] - Glitch effect types to use
+ * @property {Object} [glitch.duration] - Effect duration range in ms
+ * @property {number} [glitch.duration.min]
+ * @property {number} [glitch.duration.max]
+ * @property {string[]} [glitch.excludeSelectors]
+ * @property {Object} [morphing] - Morphing image system
+ * @property {boolean} [morphing.enabled]
+ * @property {number} [morphing.transitionDuration]
+ * @property {number} [morphing.pauseBetween]
+ * @property {string[]} [morphing.targetSelectors]
+ * @property {string[]} [morphing.blendModes]
+ * @property {Object} [ambient] - Ambient sound layer
+ * @property {boolean} [ambient.enabled]
+ * @property {number} [ambient.baseVolume]
+ * @property {boolean} [ambient.chamberSpecific]
+ * @property {number} [ambient.crossfadeDuration]
+ * @property {string} [ambient.defaultTrack]
+ * @property {Object.<string, string>} [ambient.chamberTracks]
+ * @property {Object} [animation] - Animated content
+ * @property {boolean} [animation.enabled]
+ * @property {Object} [animation.breathing]
+ * @property {boolean} [animation.breathing.enabled]
+ * @property {number} [animation.breathing.scaleMin]
+ * @property {number} [animation.breathing.scaleMax]
+ * @property {number} [animation.breathing.duration]
+ * @property {string[]} [animation.breathing.targetSelectors]
+ * @property {Object} [animation.textDrift]
+ * @property {boolean} [animation.textDrift.enabled]
+ * @property {number} [animation.textDrift.maxDrift]
+ * @property {number} [animation.textDrift.duration]
+ * @property {string[]} [animation.textDrift.targetSelectors]
+ * @property {Object} [labyrinth] - Generative labyrinth
+ * @property {boolean} [labyrinth.enabled]
+ * @property {number} [labyrinth.fragmentCount]
+ * @property {number} [labyrinth.loopholeCount]
+ * @property {string[]} [labyrinth.fragmentSources]
+ * @property {number} [labyrinth.loopholeProbability]
+ * @property {Object} [glitchTunnels] - Glitch tunnel transitions
+ * @property {boolean} [glitchTunnels.enabled]
+ * @property {number} [glitchTunnels.probability]
+ * @property {number} [glitchTunnels.duration]
+ * @property {number} [glitchTunnels.captureWidth]
+ * @property {number} [glitchTunnels.captureHeight]
+ * @property {Object} [glitchTunnels.pixelSort]
+ * @property {number} [glitchTunnels.pixelSort.thresholdLow]
+ * @property {number} [glitchTunnels.pixelSort.thresholdHigh]
+ * @property {Object} [accessibility]
+ * @property {boolean} [accessibility.respectReducedMotion]
+ * @property {boolean} [accessibility.allowUserToggle]
+ * @property {string} [accessibility.storageKey]
+ * @property {Object} [accessibility.toggleShortcut]
+ * @property {boolean} [accessibility.toggleShortcut.ctrl]
+ * @property {boolean} [accessibility.toggleShortcut.shift]
+ * @property {string} [accessibility.toggleShortcut.key]
+ */
+/**
  * LivingPantheonCore - Central orchestrator for Living Pantheon system
  * @class
  */
@@ -59,6 +126,7 @@ class LivingPantheonCore {
    */
   constructor() {
     // Get configuration from global config or use defaults
+    /** @type {LivingPantheonConfig} */
     this.config =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon || {}
@@ -513,8 +581,6 @@ class LivingPantheonCore {
       }
       this.subsystems.ambient = new AmbientSoundLayer({
         ...this.config.ambient,
-        chamberId: this.currentChamberId,
-        chamberColor: this.currentChamberColor,
       });
     }
     return this.subsystems.ambient;

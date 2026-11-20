@@ -197,7 +197,7 @@ function recoverNavigation(error, previousPage, targetId) {
  * It performs an animation that fades out the current section, then fades in the loading section.
  * Uses a state machine to prevent race conditions during navigation.
  *
- * @param {String} loadingSection - page to be faded in
+ * @param {String} _loadingSection - page to be faded in
  * @returns {Boolean} true if successful
  *
  */
@@ -333,7 +333,7 @@ function showNewSection(_loadingSection) {
 /**
  *  Fades in a page
  *
- * @param {Object} Page - page to be faded in
+ * @param {Object} _Page - page to be faded in
  * @returns {Boolean} true if successful
  */
 
@@ -444,7 +444,7 @@ function _preloadWingChambers(pageId) {
   const loader = ChamberLoader.getInstance();
 
   // Skip preloading on slow connections
-  if (loader._shouldSkipPreload && loader._shouldSkipPreload()) {
+  if (loader.shouldSkipPreload()) {
     return;
   }
 
@@ -604,7 +604,8 @@ document.addEventListener('keydown', event => {
   }
 
   // Skip other shortcuts if user is typing in an input field
-  if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+  const targetEl = /** @type {HTMLElement} */ (event.target);
+  if (targetEl.tagName === 'INPUT' || targetEl.tagName === 'TEXTAREA') {
     return;
   }
 
@@ -635,16 +636,20 @@ document.addEventListener('keydown', event => {
       break;
 
     case 'Enter':
-    case ' ':
+    case ' ': {
       // Activate focused element
-      if (document.activeElement && document.activeElement.click) {
+      const activeEl = /** @type {HTMLElement | null} */ (
+        document.activeElement
+      );
+      if (activeEl && activeEl.click) {
         // Prevent space from scrolling
         if (event.key === ' ') {
           event.preventDefault();
         }
-        document.activeElement.click();
+        activeEl.click();
       }
       break;
+    }
 
     case 'ArrowLeft':
       // Previous item in carousels

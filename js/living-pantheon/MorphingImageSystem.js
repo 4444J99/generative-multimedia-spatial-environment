@@ -42,17 +42,26 @@
  * MorphingImageSystem - Manages progressive image morphing transitions
  * @class
  */
+/**
+ * Morphing-image configuration, mirroring
+ * ETCETER4_CONFIG.livingPantheon.morphing (js/config.js). Every field is
+ * optional: the constructor merges its own defaults over the global section.
+ *
+ * @typedef {Object} MorphingOptions
+ * @property {boolean} [enabled]
+ * @property {number} [transitionDuration] - Total transition duration in ms
+ * @property {number} [pauseBetween] - Pause between morph cycles in ms
+ * @property {string[]} [targetSelectors] - CSS selectors for images to morph
+ * @property {string[]} [blendModes] - Blend modes to cycle through
+ */
 class MorphingImageSystem {
   /**
    * Create a new MorphingImageSystem instance
-   * @param {Object} [options] - Configuration options
-   * @param {number} [options.transitionDuration] - Total transition duration in ms (default: 60000)
-   * @param {number} [options.pauseBetween] - Pause between morph cycles in ms (default: 30000)
-   * @param {string[]} [options.targetSelectors] - CSS selectors for images to morph
-   * @param {string[]} [options.blendModes] - Blend modes to cycle through
+   * @param {MorphingOptions} [options] - Configuration options
    */
   constructor(options = {}) {
     // Get configuration from global config or use defaults
+    /** @type {MorphingOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.morphing || {}
@@ -235,8 +244,9 @@ class MorphingImageSystem {
     this.activeMorphs.set(element, {
       phase: 0, // 0 = not started, 1 = glitch, 2 = abstract, 3 = return to normal
       startTime: null,
-      originalFilter: element.style.filter,
-      originalBlendMode: element.style.mixBlendMode,
+      originalFilter: /** @type {HTMLElement} */ (element).style.filter,
+      originalBlendMode: /** @type {HTMLElement} */ (element).style
+        .mixBlendMode,
     });
   }
 
@@ -344,8 +354,8 @@ class MorphingImageSystem {
       this.pendingAnimationFrames.add(frameId);
     } else {
       // Morph cycle complete - reset and schedule pause
-      element.style.filter = '';
-      element.style.mixBlendMode = '';
+      /** @type {HTMLElement} */ (element).style.filter = '';
+      /** @type {HTMLElement} */ (element).style.mixBlendMode = '';
 
       state.phase = 0;
 
@@ -416,8 +426,8 @@ class MorphingImageSystem {
     }
 
     // Apply filters and blend mode
-    element.style.filter = filters.join(' ');
-    element.style.mixBlendMode = blendMode;
+    /** @type {HTMLElement} */ (element).style.filter = filters.join(' ');
+    /** @type {HTMLElement} */ (element).style.mixBlendMode = blendMode;
   }
 }
 

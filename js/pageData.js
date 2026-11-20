@@ -62,8 +62,14 @@ const _pID = {
 
 /**
  * Pages array - Contains all page instances
- * @type {Page[]}
+ * @type {Page[] & { menu?: Page, sound?: Page, stills?: Page, diary?: Page, info?: Page, ogod3d?: Page, ogodViewer?: Page, eastWing?: Page, westWing?: Page, southWing?: Page, northWing?: Page, akademia?: Page, bibliotheke?: Page, oikos?: Page, pinakotheke?: Page, agora?: Page, symposion?: Page, odeion?: Page, theatron?: Page, ergasterion?: Page, khronos?: Page, discovery?: Page }}
  * @global
+ *
+ * Pages are first built as named properties (pages.menu = new Page(...)),
+ * then collected into the plain array below, so the value is both the
+ * named map the initializers use and the array page.js navigates. The
+ * named properties are optional in the type because the final assignment
+ * is the plain array, which carries none of them.
  *
  * Each page is created with:
  * - id: HTML element ID (matches _pID constants)
@@ -431,15 +437,18 @@ pages.odeion = new Page({
         playerContainer &&
         waveformCanvas
       ) {
-        window.odeionPlayer = new EnhancedAudioPlayer({
-          container: playerContainer,
-          waveformCanvas,
-        });
+        // EnhancedAudioPlayer takes tracks only: it has no container or
+        // waveformCanvas option (both were silently ignored here), and its
+        // tracks arrive later via addTrack / the playlist manager.
+        window.odeionPlayer = new EnhancedAudioPlayer({});
         if (typeof WaveformVisualizer !== 'undefined') {
+          // canvasElement (not `canvas`) is the constructor's option, and
+          // primaryColor/secondaryColor are not options at all — colours
+          // come from ETCETER4_CONFIG.media.audio.waveform. Passing the
+          // player wires its play/pause/seek events to the visualizer.
           window.odeionWaveform = new WaveformVisualizer({
-            canvas: waveformCanvas,
-            primaryColor: '#FFD700',
-            secondaryColor: '#000000',
+            canvasElement: /** @type {HTMLCanvasElement} */ (waveformCanvas),
+            playerInstance: window.odeionPlayer,
           });
         }
       }
@@ -449,7 +458,7 @@ pages.odeion = new Page({
         const odeionContent = document.querySelector('#odeion .mw9');
         if (odeionContent) {
           window.odeionPlaylist = new PlaylistManager({
-            container: odeionContent,
+            container: /** @type {HTMLElement} */ (odeionContent),
             player: window.odeionPlayer,
             waveform: window.odeionWaveform,
           });

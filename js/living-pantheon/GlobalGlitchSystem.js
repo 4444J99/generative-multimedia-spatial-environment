@@ -30,23 +30,32 @@
 'use strict';
 
 /**
+ * Global-glitch configuration, mirroring ETCETER4_CONFIG.livingPantheon.glitch
+ * (js/config.js). Every field is optional: the constructor merges its own
+ * defaults over the global section.
+ *
+ * @typedef {Object} GlobalGlitchOptions
+ * @property {boolean} [enabled]
+ * @property {number} [frequency] - Probability of a glitch per check (0-1)
+ * @property {number} [checkInterval] - Interval between checks in ms
+ * @property {string[]} [types] - Glitch effect types to use
+ * @property {Object} [duration] - Duration range for effects in ms
+ * @property {number} [duration.min]
+ * @property {number} [duration.max]
+ * @property {string[]} [excludeSelectors] - CSS selectors to exclude from glitching
+ */
+/**
  * GlobalGlitchSystem - Manages random visual glitch effects across the DOM
  * @class
  */
 class GlobalGlitchSystem {
   /**
    * Create a new GlobalGlitchSystem instance
-   * @param {Object} [options] - Configuration options
-   * @param {number} [options.frequency] - Probability of glitch per check (0-1)
-   * @param {number} [options.checkInterval] - Interval between checks in ms
-   * @param {string[]} [options.types] - Array of glitch effect types to use
-   * @param {Object} [options.duration] - Duration range for effects
-   * @param {number} [options.duration.min] - Minimum duration in ms
-   * @param {number} [options.duration.max] - Maximum duration in ms
-   * @param {string[]} [options.excludeSelectors] - CSS selectors to exclude from glitching
+   * @param {GlobalGlitchOptions} [options] - Configuration options
    */
   constructor(options = {}) {
     // Get configuration from global config or use defaults
+    /** @type {GlobalGlitchOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.glitch || {}
@@ -464,7 +473,7 @@ class GlobalGlitchSystem {
     // Ensure element has relative positioning for overlay
     const originalPosition = window.getComputedStyle(element).position;
     if (originalPosition === 'static') {
-      element.style.position = 'relative';
+      /** @type {HTMLElement} */ (element).style.position = 'relative';
     }
 
     element.appendChild(overlay);
@@ -477,7 +486,7 @@ class GlobalGlitchSystem {
           overlay.remove();
         }
         if (originalPosition === 'static') {
-          element.style.position = '';
+          /** @type {HTMLElement} */ (element).style.position = '';
         }
         this.activeGlitches.delete(element);
         this.pendingAnimationFrames.delete(removeOverlay);
@@ -499,7 +508,8 @@ class GlobalGlitchSystem {
    */
   _applyPositionGlitch(element, duration) {
     // Store original transform
-    const originalTransform = element.style.transform;
+    const originalTransform = /** @type {HTMLElement} */ (element).style
+      .transform;
 
     // Generate small random offset (1-5 pixels)
     const offsetX = (Math.random() - 0.5) * 10;
@@ -510,13 +520,14 @@ class GlobalGlitchSystem {
       ? `${originalTransform} translate(${offsetX}px, ${offsetY}px)`
       : `translate(${offsetX}px, ${offsetY}px)`;
 
-    element.style.transform = newTransform;
+    /** @type {HTMLElement} */ (element).style.transform = newTransform;
 
     // Schedule restoration
     const startTime = performance.now();
     const restorePosition = currentTime => {
       if (currentTime - startTime >= duration) {
-        element.style.transform = originalTransform;
+        /** @type {HTMLElement} */ (element).style.transform =
+          originalTransform;
         this.activeGlitches.delete(element);
         this.pendingAnimationFrames.delete(restorePosition);
       } else {
@@ -537,7 +548,7 @@ class GlobalGlitchSystem {
    */
   _applyImageGlitch(element, duration) {
     // Store original filter
-    const originalFilter = element.style.filter;
+    const originalFilter = /** @type {HTMLElement} */ (element).style.filter;
 
     // Generate random filter effect
     const filterEffects = [
@@ -552,7 +563,7 @@ class GlobalGlitchSystem {
       filterEffects[Math.floor(Math.random() * filterEffects.length)];
 
     // Apply filter
-    element.style.filter = originalFilter
+    /** @type {HTMLElement} */ (element).style.filter = originalFilter
       ? `${originalFilter} ${selectedFilter}`
       : selectedFilter;
 
@@ -560,7 +571,7 @@ class GlobalGlitchSystem {
     const startTime = performance.now();
     const restoreFilter = currentTime => {
       if (currentTime - startTime >= duration) {
-        element.style.filter = originalFilter;
+        /** @type {HTMLElement} */ (element).style.filter = originalFilter;
         this.activeGlitches.delete(element);
         this.pendingAnimationFrames.delete(restoreFilter);
       } else {

@@ -33,6 +33,26 @@ jobs:
       - name: Validate package-lock.json
         run: npm run validate:package-lock
 
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript check
+        run: npm run typecheck
+
   security-audit:
     name: Security Audit
     runs-on: ubuntu-24.04
@@ -244,6 +264,7 @@ jobs:
     needs:
       [
         lint-and-format,
+        typecheck,
         security-audit,
         lighthouse,
         unit-tests,

@@ -7,16 +7,27 @@
  * In standalone test contexts without registration, it preserves Wave 1 cache isolation behavior.
  */
 
+/**
+ * Service-worker scope: this file runs as a worker, not a window. The DOM
+ * lib types `self` as Window, so the worker-only members (registration,
+ * clients, skipWaiting, location, the test hooks below) are reached through
+ * this alias, typed by ServiceWorkerScope in js/globals.d.ts.
+ * @type {ServiceWorkerScope}
+ */
+const workerScope = /** @type {ServiceWorkerScope} */ (
+  /** @type {unknown} */ (self)
+);
+
 if (
   typeof self !== 'undefined' &&
-  self.registration &&
-  typeof self.registration.unregister === 'function'
+  workerScope.registration &&
+  typeof workerScope.registration.unregister === 'function'
 ) {
-  self.addEventListener('install', () => {
-    self.skipWaiting();
+  workerScope.addEventListener('install', () => {
+    workerScope.skipWaiting();
   });
-  self.addEventListener('activate', event => {
-    event.waitUntil(self.registration.unregister());
+  workerScope.addEventListener('activate', event => {
+    event.waitUntil(workerScope.registration.unregister());
   });
 } else {
   const MEDIA_CACHE_PREFIX = 'etceter4-media-';
@@ -448,11 +459,11 @@ if (
    */
   if (
     typeof self !== 'undefined' &&
-    typeof self.addEventListener === 'function'
+    typeof workerScope.addEventListener === 'function'
   ) {
-    self.addEventListener('install', event => {
+    workerScope.addEventListener('install', event => {
       console.warn('[MediaSW] Installing...');
-      event.waitUntil(self.skipWaiting());
+      event.waitUntil(workerScope.skipWaiting());
     });
 
     /**
@@ -460,7 +471,7 @@ if (
      * Namespaced: only deletes obsolete media caches (prefixed with etceter4-media- or legacy media-cache-)
      * Never deletes caches belonging to root sw.js (etceter4-shell- or etceter4-v)
      */
-    self.addEventListener('activate', event => {
+    workerScope.addEventListener('activate', event => {
       console.warn('[MediaSW] Activating...');
 
       event.waitUntil(
@@ -480,21 +491,21 @@ if (
               })
             );
           })
-          .then(() => self.clients.claim())
+          .then(() => workerScope.clients.claim())
       );
     });
 
     /**
      * Fetch event: intercept media requests
      */
-    self.addEventListener('fetch', event => {
+    workerScope.addEventListener('fetch', event => {
       const { request } = event;
       const url = new URL(request.url);
 
       // Only handle R2 media URLs and same-origin requests
       const isMediaURL =
         url.hostname === 'media.etceter4.com' ||
-        url.origin === self.location.origin;
+        url.origin === workerScope.location.origin;
       const isMediaRequest =
         isAudioFile(url) ||
         isThumbnailFile(url) ||
@@ -530,7 +541,7 @@ if (
     /**
      * Message event: handle cache management commands
      */
-    self.addEventListener('message', event => {
+    workerScope.addEventListener('message', event => {
       const { type, payload } = event.data;
 
       switch (type) {
@@ -856,8 +867,8 @@ function planCacheEviction(entries, maxBytes) {
 
 // Attach to environments (Workers, Window/Global, and CommonJS)
 if (typeof self !== 'undefined') {
-  self.evaluateRangeSlice = evaluateRangeSlice;
-  self.planCacheEviction = planCacheEviction;
+  workerScope.evaluateRangeSlice = evaluateRangeSlice;
+  workerScope.planCacheEviction = planCacheEviction;
 }
 if (typeof globalThis !== 'undefined') {
   globalThis.evaluateRangeSlice = evaluateRangeSlice;
