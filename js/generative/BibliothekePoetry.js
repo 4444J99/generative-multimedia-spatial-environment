@@ -20,7 +20,7 @@ class BibliothekePoetry {
     this.initialized = false;
     /** @type {Array<HTMLElement>} Managed poem containers */
     this.containers = [];
-    /** @type {number|null} Auto-regeneration interval */
+    /** @type {ReturnType<typeof setInterval> | null} Auto-regeneration interval */
     this.regenInterval = null;
 
     // Word pools — seeded from sketch.js emotionGroups, extended for literary use
@@ -206,7 +206,7 @@ class BibliothekePoetry {
       return;
     }
 
-    poems.forEach(el => {
+    poems.forEach((/** @type {HTMLElement} */ el) => {
       this.containers.push(el);
       this._generateAndRender(el);
     });

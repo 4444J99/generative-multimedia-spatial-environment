@@ -45,17 +45,26 @@
  * LabyrinthGenerator - Manages generative diary content and secret loopholes
  * @class
  */
+/**
+ * Labyrinth configuration, mirroring ETCETER4_CONFIG.livingPantheon.labyrinth
+ * (js/config.js). Every field is optional: the constructor merges its own
+ * defaults over the global section.
+ *
+ * @typedef {Object} LabyrinthOptions
+ * @property {boolean} [enabled]
+ * @property {string[]} [fragmentSources] - JSON file paths for fragments
+ * @property {number} [fragmentCount] - Target number of fragments to load
+ * @property {number} [loopholeCount] - Number of loopholes to create
+ * @property {number} [loopholeProbability] - Probability of loophole trigger (0-1)
+ */
 class LabyrinthGenerator {
   /**
    * Create a new LabyrinthGenerator instance
-   * @param {Object} [options] - Configuration options
-   * @param {string[]} [options.fragmentSources] - Array of JSON file paths for fragments
-   * @param {number} [options.fragmentCount] - Target number of fragments to load
-   * @param {number} [options.loopholeCount] - Number of loopholes to create
-   * @param {number} [options.loopholeProbability] - Probability of loophole trigger (0-1)
+   * @param {LabyrinthOptions} [options] - Configuration options
    */
   constructor(options = {}) {
     // Get configuration from global config or use defaults
+    /** @type {LabyrinthOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.labyrinth || {}
@@ -461,7 +470,7 @@ class LabyrinthGenerator {
       entries.sort((a, b) => {
         const dateA = this._parseDate(a.dateStr);
         const dateB = this._parseDate(b.dateStr);
-        return dateB - dateA; // Most recent first
+        return (dateB?.getTime() ?? 0) - (dateA?.getTime() ?? 0); // Most recent first
       });
     }
 

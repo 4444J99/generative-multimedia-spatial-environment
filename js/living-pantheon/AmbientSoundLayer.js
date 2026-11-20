@@ -35,21 +35,30 @@
 'use strict';
 
 /**
+ * Ambient sound configuration, mirroring ETCETER4_CONFIG.livingPantheon.ambient
+ * (js/config.js). Every field is optional: the constructor merges its own
+ * defaults over the global section.
+ *
+ * @typedef {Object} AmbientSoundOptions
+ * @property {boolean} [enabled]
+ * @property {number} [baseVolume] - Base volume level (0.0 to 1.0)
+ * @property {boolean} [chamberSpecific] - Use chamber-specific tracks
+ * @property {number} [crossfadeDuration] - Fade duration in ms
+ * @property {string} [defaultTrack] - Fallback track path
+ * @property {Object.<string, string>} [chamberTracks] - Chamber-specific track mapping
+ */
+/**
  * AmbientSoundLayer - Manages background ambient audio for the Living Pantheon
  * @class
  */
 class AmbientSoundLayer {
   /**
    * Create a new AmbientSoundLayer instance
-   * @param {Object} [options] - Configuration options
-   * @param {number} [options.baseVolume] - Base volume level (0.0 to 1.0)
-   * @param {boolean} [options.chamberSpecific] - Use chamber-specific tracks
-   * @param {number} [options.crossfadeDuration] - Fade duration in ms
-   * @param {string} [options.defaultTrack] - Fallback track path
-   * @param {Object} [options.chamberTracks] - Chamber-specific track mapping
+   * @param {AmbientSoundOptions} [options] - Configuration options
    */
   constructor(options = {}) {
     // Get configuration from global config or use defaults
+    /** @type {AmbientSoundOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.ambient || {}
@@ -278,7 +287,7 @@ class AmbientSoundLayer {
       onloaderror: (id, err) => {
         console.warn(`AmbientSoundLayer: Failed to load "${trackPath}":`, err);
       },
-      onfail: (id, err) => {
+      onplayerror: (id, err) => {
         console.warn(`AmbientSoundLayer: Sound error for "${trackPath}":`, err);
       },
     });
@@ -318,7 +327,7 @@ class AmbientSoundLayer {
           err
         );
       },
-      onfail: (id, err) => {
+      onplayerror: (id, err) => {
         console.warn(
           `AmbientSoundLayer: Sound error for new track "${newTrackPath}":`,
           err

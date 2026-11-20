@@ -36,7 +36,9 @@ function cleanupOgod() {
  * and drives the animation through OGODAnimationEngine.
  */
 function initStandaloneOgod() {
-  const bgiElement = document.getElementById('bgi');
+  const bgiElement = /** @type {HTMLImageElement | null} */ (
+    document.getElementById('bgi')
+  );
   if (!bgiElement) {
     return; // Not a standalone OGOD page
   }
@@ -71,7 +73,9 @@ function initStandaloneOgod() {
     bgElement.style.display = 'none';
 
     // Read initial mode from mode selector (if present), default to "faithful"
-    const modeSelect = document.querySelector('.ogod-mode-select');
+    const modeSelect = /** @type {HTMLSelectElement | null} */ (
+      document.querySelector('.ogod-mode-select')
+    );
     const initialMode = modeSelect ? modeSelect.value : 'faithful';
 
     try {
@@ -88,7 +92,8 @@ function initStandaloneOgod() {
       if (modeSelect) {
         modeSelect.addEventListener('change', e => {
           if (ogodEngine) {
-            ogodEngine.setMode(e.target.value);
+            const target = /** @type {HTMLSelectElement} */ (e.target);
+            ogodEngine.setMode(target.value);
           }
         });
       }
@@ -120,7 +125,7 @@ function initStandaloneOgod() {
 /**
  * Legacy fallback - original CSS offset technique
  * Used when the modern engine fails to load
- * @param {HTMLImageElement} img - The #bgi image element
+ * @param {HTMLImageElement} _img - The #bgi image element
  */
 function fallbackToLegacy(_img) {
   const config =

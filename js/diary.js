@@ -56,7 +56,9 @@ const diaryCarousel = new Carousel({
 
 function renderDiaryPage() {
   const file = diaryFiles[diaryCarousel.index];
-  const image = document.querySelector('#diary-leftImage img');
+  const image = /** @type {HTMLImageElement | null} */ (
+    document.querySelector('#diary-leftImage img')
+  );
   if (!file || !image) {
     return;
   }

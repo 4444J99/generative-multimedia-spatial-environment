@@ -18,13 +18,14 @@
 export class AIExhibit {
   /**
    * @param {Object} [config]
-   * @param {string} config.id - Unique exhibit ID
-   * @param {string} config.title - Display title
-   * @param {string} config.description - Detailed description
-   * @param {string} config.tech - Technology stack
-   * @param {string} config.color - Theme accent color
-   * @param {string} config.icon - Visual glyph / emoji
-   * @param {string} config.src - Path to exhibit distribution bundle
+   * @param {string} [config.id] - Unique exhibit ID
+   * @param {string} [config.title] - Display title
+   * @param {string} [config.description] - Detailed description
+   * @param {string} [config.tech] - Technology stack
+   * @param {string} [config.color] - Theme accent color
+   * @param {string} [config.icon] - Visual glyph / emoji
+   * @param {string} [config.src] - Path to exhibit distribution bundle
+   * @param {string} [config.apiKey] - Optional provider API key (checked by hasCredentials)
    */
   constructor(config = {}) {
     this.id = config.id || 'unnamed-exhibit';
@@ -239,7 +240,9 @@ export class AIExhibit {
     }
 
     // Render exhibit-specific local simulation
-    const simContainer = wrapper.querySelector('.local-simulation-container');
+    const simContainer = /** @type {HTMLElement | null} */ (
+      wrapper.querySelector('.local-simulation-container')
+    );
     if (simContainer) {
       this.renderLocalSimulation(simContainer);
     }

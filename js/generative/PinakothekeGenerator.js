@@ -60,7 +60,10 @@ class PinakothekeGenerator {
     this.observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          const idx = parseInt(entry.target.dataset.sketchIndex, 10);
+          const idx = parseInt(
+            /** @type {HTMLElement} */ (entry.target).dataset.sketchIndex,
+            10
+          );
           const instance = this.instances[idx];
           if (!instance) {
             return;
@@ -83,14 +86,14 @@ class PinakothekeGenerator {
       fractalGrowth: this._fractalGrowth.bind(this),
     };
 
-    canvases.forEach((canvas, index) => {
+    canvases.forEach((/** @type {HTMLElement} */ canvas, index) => {
       const sketchName = canvas.dataset.sketch;
       const sketchFn = sketchMap[sketchName];
       if (!sketchFn) {
         return;
       }
 
-      canvas.dataset.sketchIndex = index;
+      canvas.dataset.sketchIndex = String(index);
 
       try {
         const parent = canvas.parentElement;

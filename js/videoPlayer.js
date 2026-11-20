@@ -129,7 +129,11 @@ class VideoPlayer {
     }
 
     // Create new player
-    this.player = videojs(`${this.id}-video`, this.options);
+    // video.js is a page-level global (@types/video.js is a UMD export,
+    // which a module file cannot reference bare); window.videojs is the
+    // same binding. No page in the repo was found loading video.js —
+    // verify before relying on the player.
+    this.player = window.videojs(`${this.id}-video`, this.options);
 
     // Set video source
     const sources = [];

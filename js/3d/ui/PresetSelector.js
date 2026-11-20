@@ -171,14 +171,19 @@ class PresetSelector {
     toggleBtn.addEventListener('click', () => this.toggle());
 
     // Preset options
-    const options = this.containerElement.querySelectorAll('.preset-option');
+    const options = /** @type {NodeListOf<HTMLElement>} */ (
+      this.containerElement.querySelectorAll('.preset-option')
+    );
     options.forEach(option => {
       option.addEventListener('click', e => this._handlePresetSelect(e));
     });
 
     // Close on outside click
     document.addEventListener('click', e => {
-      if (!this.containerElement.contains(e.target) && this.isOpen) {
+      if (
+        !this.containerElement.contains(/** @type {Node} */ (e.target)) &&
+        this.isOpen
+      ) {
         this.close();
       }
     });
@@ -195,17 +200,23 @@ class PresetSelector {
    * @param {KeyboardEvent} e
    */
   _handleKeyDown(e) {
-    const options = this.containerElement.querySelectorAll('.preset-option');
+    const options = /** @type {NodeListOf<HTMLElement>} */ (
+      this.containerElement.querySelectorAll('.preset-option')
+    );
     const currentIndex = Array.from(options).findIndex(
       opt => opt === document.activeElement
     );
 
     switch (e.key) {
-      case 'Escape':
+      case 'Escape': {
         this.close();
-        this.containerElement.querySelector('.preset-selector-toggle').focus();
+        const toggleBtn = /** @type {HTMLElement} */ (
+          this.containerElement.querySelector('.preset-selector-toggle')
+        );
+        toggleBtn.focus();
         e.preventDefault();
         break;
+      }
       case 'ArrowDown':
         if (this.isOpen && currentIndex < options.length - 1) {
           options[currentIndex + 1].focus();
@@ -233,10 +244,13 @@ class PresetSelector {
   /**
    * Handle preset selection
    * @private
-   * @param {Event} e
+   * @param {Event | { target: Element | null }} e
    */
   _handlePresetSelect(e) {
-    const option = e.target.closest('.preset-option');
+    const target = /** @type {HTMLElement} */ (e.target);
+    const option = /** @type {HTMLElement | null} */ (
+      target.closest('.preset-option')
+    );
     if (!option) {
       return;
     }
@@ -262,11 +276,13 @@ class PresetSelector {
     this._updateSelectedUI(archetype);
 
     // Update option states
-    const options = this.containerElement.querySelectorAll('.preset-option');
+    const options = /** @type {NodeListOf<HTMLElement>} */ (
+      this.containerElement.querySelectorAll('.preset-option')
+    );
     options.forEach(option => {
       const isSelected = option.dataset.archetype === archetypeId;
       option.classList.toggle('selected', isSelected);
-      option.setAttribute('aria-selected', isSelected);
+      option.setAttribute('aria-selected', String(isSelected));
     });
 
     // Notify callback
@@ -281,7 +297,9 @@ class PresetSelector {
    * @param {Object} archetype
    */
   _updateSelectedUI(archetype) {
-    const iconEl = this.containerElement.querySelector('#current-preset-icon');
+    const iconEl = /** @type {HTMLElement | null} */ (
+      this.containerElement.querySelector('#current-preset-icon')
+    );
     const labelEl = this.containerElement.querySelector(
       '#current-preset-label'
     );
@@ -311,8 +329,8 @@ class PresetSelector {
 
     if (recommended) {
       // Update recommended section
-      const recommendedSection = this.containerElement.querySelector(
-        '#preset-recommended'
+      const recommendedSection = /** @type {HTMLElement | null} */ (
+        this.containerElement.querySelector('#preset-recommended')
       );
       const recommendedName =
         this.containerElement.querySelector('#recommended-name');
@@ -323,7 +341,9 @@ class PresetSelector {
       }
 
       // Mark recommended option
-      const options = this.containerElement.querySelectorAll('.preset-option');
+      const options = /** @type {NodeListOf<HTMLElement>} */ (
+        this.containerElement.querySelectorAll('.preset-option')
+      );
       options.forEach(option => {
         option.classList.toggle(
           'recommended',
@@ -354,11 +374,15 @@ class PresetSelector {
     );
     toggleBtn.setAttribute('aria-expanded', 'true');
 
-    const list = this.containerElement.querySelector('#preset-list');
+    const list = /** @type {HTMLElement | null} */ (
+      this.containerElement.querySelector('#preset-list')
+    );
     list.hidden = false;
 
     // Focus first option
-    const firstOption = this.containerElement.querySelector('.preset-option');
+    const firstOption = /** @type {HTMLElement | null} */ (
+      this.containerElement.querySelector('.preset-option')
+    );
     if (firstOption) {
       firstOption.focus();
     }
@@ -380,7 +404,9 @@ class PresetSelector {
     );
     toggleBtn.setAttribute('aria-expanded', 'false');
 
-    const list = this.containerElement.querySelector('#preset-list');
+    const list = /** @type {HTMLElement | null} */ (
+      this.containerElement.querySelector('#preset-list')
+    );
     list.hidden = true;
   }
 

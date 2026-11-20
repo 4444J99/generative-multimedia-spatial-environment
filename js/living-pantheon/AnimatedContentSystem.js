@@ -15,11 +15,31 @@
 
 'use strict';
 
+/**
+ * Animated-content configuration, mirroring
+ * ETCETER4_CONFIG.livingPantheon.animation (js/config.js). Every field is
+ * optional: the constructor merges its own defaults over the global section.
+ *
+ * @typedef {Object} AnimatedContentOptions
+ * @property {boolean} [enabled]
+ * @property {Object} [breathing] - Breathing animation (subtle scale pulse)
+ * @property {boolean} [breathing.enabled]
+ * @property {number} [breathing.scaleMin]
+ * @property {number} [breathing.scaleMax]
+ * @property {number} [breathing.duration] - One breath cycle in ms
+ * @property {string[]} [breathing.targetSelectors]
+ * @property {Object} [textDrift] - Text drift (subtle position movement)
+ * @property {boolean} [textDrift.enabled]
+ * @property {number} [textDrift.maxDrift] - Maximum drift in pixels
+ * @property {number} [textDrift.duration] - One drift cycle in ms
+ * @property {string[]} [textDrift.targetSelectors]
+ */
 class AnimatedContentSystem {
   /**
-   * @param {Object} [options] - Configuration from LivingPantheonCore
+   * @param {AnimatedContentOptions} [options] - Configuration from LivingPantheonCore
    */
   constructor(options = {}) {
+    /** @type {AnimatedContentOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.animation || {}
@@ -162,7 +182,7 @@ class AnimatedContentSystem {
     const elements = document.querySelectorAll(selector);
 
     for (const el of elements) {
-      el.style.transform = `scale(${scale})`;
+      /** @type {HTMLElement} */ (el).style.transform = `scale(${scale})`;
     }
   }
 
@@ -183,7 +203,8 @@ class AnimatedContentSystem {
     const elements = document.querySelectorAll(selector);
 
     for (const el of elements) {
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      /** @type {HTMLElement} */ (el).style.transform =
+        `translate(${dx}px, ${dy}px)`;
     }
   }
 
@@ -200,7 +221,7 @@ class AnimatedContentSystem {
     const elements = document.querySelectorAll(selector);
 
     for (const el of elements) {
-      el.style.transform = '';
+      /** @type {HTMLElement} */ (el).style.transform = '';
     }
   }
 }

@@ -19,8 +19,27 @@
 
 'use strict';
 
+/**
+ * Glitch-tunnel configuration, mirroring
+ * ETCETER4_CONFIG.livingPantheon.glitchTunnels (js/config.js). Every field
+ * is optional: the constructor merges its own defaults over the global section.
+ *
+ * @typedef {Object} GlitchTunnelOptions
+ * @property {boolean} [enabled]
+ * @property {number} [probability] - Probability of triggering per navigation
+ * @property {number} [duration] - Total effect duration in ms
+ * @property {number} [captureWidth] - Capture resolution (lower = faster)
+ * @property {number} [captureHeight]
+ * @property {Object} [pixelSort]
+ * @property {number} [pixelSort.thresholdLow]
+ * @property {number} [pixelSort.thresholdHigh]
+ */
 class GlitchTunnelSystem {
+  /**
+   * @param {GlitchTunnelOptions} [options] - Configuration options
+   */
   constructor(options = {}) {
+    /** @type {GlitchTunnelOptions} */
     const configFromGlobal =
       typeof ETCETER4_CONFIG !== 'undefined'
         ? ETCETER4_CONFIG.livingPantheon?.glitchTunnels || {}
@@ -156,8 +175,10 @@ class GlitchTunnelSystem {
   async _captureViewport() {
     try {
       // Find the currently visible section
-      const visibleSection = document.querySelector(
-        'section:not(.dn)[id]:not([style*="display: none"])'
+      const visibleSection = /** @type {HTMLElement | null} */ (
+        document.querySelector(
+          'section:not(.dn)[id]:not([style*="display: none"])'
+        )
       );
       if (!visibleSection) {
         return null;

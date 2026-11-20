@@ -10,7 +10,7 @@
 class PlaylistManager {
   /**
    * @param {Object} options
-   * @param {HTMLElement} options.container - Odeion player container element
+   * @param {HTMLElement} [options.container] - Odeion player container element (required by initialize(), not by construction)
    * @param {EnhancedAudioPlayer} [options.player] - Existing player instance
    * @param {WaveformVisualizer} [options.waveform] - Existing waveform instance
    */
@@ -97,7 +97,7 @@ class PlaylistManager {
       card.type = 'button';
       card.className =
         'odeion-album-card chamber-card pointer ma2 ba b--white-20 br3 pa3 tc white bg-black-70';
-      card.dataset.albumIndex = idx;
+      card.dataset.albumIndex = String(idx);
       card.dataset.section = 'album';
       card.style.width = '200px';
       card.setAttribute('aria-pressed', 'false');
@@ -233,7 +233,10 @@ class PlaylistManager {
       'odeion-volume',
     ].forEach(id => {
       const control = document.getElementById(id);
-      if (control) {
+      if (
+        control instanceof HTMLButtonElement ||
+        control instanceof HTMLInputElement
+      ) {
         control.disabled = !enabled;
       }
     });
@@ -263,7 +266,7 @@ class PlaylistManager {
       ?.querySelectorAll('.odeion-album-card')
       .forEach((card, i) => {
         card.setAttribute('aria-pressed', String(i === albumIndex));
-        card.style.borderColor =
+        /** @type {HTMLElement} */ (card).style.borderColor =
           i === albumIndex ? '#ffd700' : 'rgba(255,255,255,0.13)';
       });
 
@@ -322,7 +325,8 @@ class PlaylistManager {
         row.type = 'button';
         row.setAttribute('aria-label', `Play ${track.title}`);
       } else {
-        row.href = track.externalUrl;
+        // In this branch the row is the <a> created above, not the <button>.
+        /** @type {HTMLAnchorElement} */ (row).href = track.externalUrl;
         row.setAttribute('aria-label', `Listen to ${track.title} on Bandcamp`);
       }
       const number = document.createElement('span');
@@ -367,7 +371,8 @@ class PlaylistManager {
 
     // Highlight current track
     this._trackList?.querySelectorAll('.odeion-track-row').forEach((row, i) => {
-      row.style.background = i === trackIndex ? 'rgba(255,215,0,0.1)' : '';
+      /** @type {HTMLElement} */ (row).style.background =
+        i === trackIndex ? 'rgba(255,215,0,0.1)' : '';
     });
 
     // Play via EnhancedAudioPlayer

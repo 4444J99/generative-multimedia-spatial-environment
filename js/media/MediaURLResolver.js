@@ -16,11 +16,14 @@
  * // => 'https://media.etceter4.com/video/performances/electronica-2015/720p.m3u8'
  */
 class MediaURLResolver {
-  /** Classic-script const bindings do not become properties on window. */
+  /**
+   * Classic-script const bindings do not become properties on
+   * window, so there is no globalThis fallback: when the config
+   * script has not run, the config is simply absent ({}). The
+   * old `globalThis.ETCETER4_CONFIG` read was always undefined.
+   */
   static getConfig() {
-    return typeof ETCETER4_CONFIG !== 'undefined'
-      ? ETCETER4_CONFIG
-      : globalThis.ETCETER4_CONFIG || {};
+    return typeof ETCETER4_CONFIG !== 'undefined' ? ETCETER4_CONFIG : {};
   }
 
   /** Look up the existing object key or the stable public album ID. */

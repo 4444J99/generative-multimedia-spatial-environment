@@ -95,7 +95,7 @@ class TheatronVisuals {
   /**
    * Get the p5 sketch function for a given name
    * @param {string} name
-   * @returns {Function|null}
+   * @returns {((p: p5) => void) | null}
    */
   _getSketchFunction(name) {
     const palette = this.palette;
