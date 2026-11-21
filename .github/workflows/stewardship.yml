@@ -22,6 +22,6 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
       - name: Test intention-preserving automation
         run: node --test tests/governance/*.test.cjs
