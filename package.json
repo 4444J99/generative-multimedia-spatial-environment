@@ -24,7 +24,7 @@
     "@playwright/test": "^1.65.1",
     "@types/google.analytics": "^0.0.46",
     "@types/howler": "^2.2.13",
-    "@types/jquery": "^3.5.34",
+    "@types/jquery": "^4.0.1",
     "@types/p5": "^1.7.7",
     "@types/video.js": "^7.3.58",
     "browser-sync": "^3.0.3",
@@ -33,12 +33,12 @@
     "html-validate": "^11.21.1",
     "husky": "^9.0.0",
     "jsdom": "^31.0.1",
-    "lint-staged": "^17.6.1",
+    "lint-staged": "^17.6.2",
     "prettier": "^3.10.1",
     "semver": "^7.8.6",
     "sharp": "^0.35.5",
-    "typescript": "^5.9.3",
-    "vitest": "5.1.0"
+    "typescript": "^7.0.2",
+    "vitest": "5.1.1"
   },
   "scripts": {
     "dev": "browser-sync start --server --files '*.html, css/*.css, js/*.js' --port 3000",
