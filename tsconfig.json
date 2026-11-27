@@ -11,7 +11,8 @@
     "resolveJsonModule": false,
     "skipLibCheck": true,
     "strict": false,
-    "target": "ES2022"
+    "target": "ES2022",
+    "types": ["google.analytics", "howler", "jquery", "node"]
   },
   "include": [
     "js/globals.d.ts",

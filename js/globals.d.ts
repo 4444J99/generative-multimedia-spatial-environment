@@ -49,6 +49,10 @@ declare global {
   var Carousel: any; // js/modules/Carousel.js
   var DiscoveryController: any; // js/discovery/DiscoveryController.js
   var OGODAnimationEngine: any; // js/ogod/OGODAnimationEngine.js
+  // js/ogod.js uses OGODAnimationEngine as a TYPE (JSDoc @type {OGODAnimationEngine|null});
+  // TypeScript 7 enforces the value/type distinction (TS2749), so the type half is
+  // declared here alongside the value, still `any` until the defining file joins the surface.
+  type OGODAnimationEngine = any;
   var OGODViewerController: any; // js/ogod/OGODViewerController.js
   var OGODSceneManager: any; // js/3d/ogod/OGODSceneManager.js
   var OGODAudioEngine: any; // js/3d/ogod/OGODAudioEngine.js
